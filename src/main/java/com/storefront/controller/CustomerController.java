@@ -3,7 +3,6 @@ package com.storefront.controller;
 import com.storefront.Utility;
 import com.storefront.model.Customer;
 import com.storefront.respository.CustomerRepository;
-import com.storefront.respository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,26 +21,30 @@ public class CustomerController {
 
     private CustomerRepository customerRepository;
 
-    private ProductRepository productRepository;
 
     @Autowired
-    public CustomerController(CustomerRepository customerRepository, ProductRepository productRepository) {
+    public CustomerController(CustomerRepository customerRepository) {
         this.customerRepository = customerRepository;
-        this.productRepository = productRepository;
     }
 
     @RequestMapping(path = "/sample", method = RequestMethod.GET)
     public ResponseEntity<String> sampleData() {
-        Utility utility = new Utility(customerRepository, productRepository);
-        utility.createTestProducts();
-        utility.createOrderHistory();
-//        utility.createTestCustomers();
-        return new ResponseEntity("Sample data created", HttpStatus.CREATED);
+
+        List<Customer> customerList = customerRepository.findAll();
+
+        for (Customer customer : customerList) {
+            customer.setOrders(Utility.createSampleOrderHistory());
+        }
+
+        customerRepository.saveAll(customerList);
+
+        return new ResponseEntity("Customer order history added", HttpStatus.OK);
     }
 
     @RequestMapping(path = "/summary", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<Map<String, List<Customer>>> candidateSummary() {
+
         List<Customer> candidateList = customerRepository.findAll();
         return new ResponseEntity<>(Collections.singletonMap("candidates", candidateList), HttpStatus.OK);
     }

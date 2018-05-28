@@ -12,23 +12,29 @@ For [Kakfa](https://kafka.apache.org/), I use my [garystafford/kafka-docker](htt
 
 ## Commands
 
-I debug directly from JetBrains IntelliJ. For testing the application in development, I build the jar, copy it to Alpine Linux OpenJDK `testapp` container, and run it.
+I debug directly from JetBrains IntelliJ. For testing the application in development, I build the jar, copy it to Alpine Linux OpenJDK `testapp` container, and run it. If testing more than one service in the same testapp container, make sure ports don't collide. Start services on different ports.
 
 ```bash
 # build
 ./gradlew clean build -x test
 
 # copy
-docker cp /build/libs/orders-1.0.0.jar kafka-docker_testapp_1:/orders-1.0.0.jar
+docker cp build/libs/orders-1.0.0.jar kafka-docker_testapp_1:/orders-1.0.0.jar
 docker exec -it kafka-docker_testapp_1 sh
 
 # install curl
 apk update && apk add curl
 
 # start with 'dev' profile
-java -jar orders-1.0.0.jar --spring.profiles.active=dev
+# same testapp container as accounts,
+# so start on different port
+java -jar orders-1.0.0.jar \
+    --spring.profiles.active=dev \
+    --server.port=8890
 
-curl localhost:8080/customers/sample
+curl http://localhost:8080/customers/sample
+curl http://localhost:8890/products/sample
+
 ```
 
 ## Container Infrastructure
@@ -43,19 +49,18 @@ fde71dcb89be        wurstmeister/kafka:latest       "start-kafka.sh"         21 
 
 ## Current Results
 
-Output from application, on the `test` topic
+Output from application, on the `accounts` topic
 
 ```text
-2018-05-27 20:22:05.787  INFO 128 --- [nio-8080-exec-1] o.a.kafka.common.utils.AppInfoParser     : Kafka version : 1.0.1
+2018-05-28 19:11:19.383  INFO 22 --- [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-1, groupId=json] Setting newly assigned partitions [accounts-0]
 
-2018-05-27 20:22:05.787  INFO 128 --- [nio-8080-exec-1] o.a.kafka.common.utils.AppInfoParser     : Kafka commitId : c0518aa65f25317e
-I found this Source: Customer(id=5b0b136dbe417600801761c9, name=Name(title=Ms., firstName=Mary, middleName=null, lastName=Smith, suffix=null), contact=Contact(primaryPhone=456-789-0001, secondaryPhone=456-222-1111, email=marysmith@yougotmail.com), addresses=[Address(type=BILLING, description=My CC billing address, address1=1234 Main Street, address2=null, city=Anywhere, state=NY, postalCode=45455-66677), Address(type=SHIPPING, description=Home Sweet Home, address1=1234 Main Street, address2=null, city=Anywhere, state=NY, postalCode=45455-66677)], creditCards=[CreditCard(type=PRIMARY, description=VISA, number=4545-6767-8989-0000, expiration=7/21, nameOnCard=Mary Smith)], credentials=Credentials(username=msmith445, password=S*$475hf&*dddFFG3))
+2018-05-28 19:11:19.388  INFO 22 --- [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : partitions assigned: [accounts-0]
 
-2018-05-27 20:22:05.954  INFO 128 --- [nio-8080-exec-1] com.storefront.kafka.Sender                  : sending payload='Customer(id=5b0b136dbe417600801761c9, name=Name(title=Ms., firstName=Mary, middleName=null, lastName=Smith, suffix=null), contact=Contact(primaryPhone=456-789-0001, secondaryPhone=456-222-1111, email=marysmith@yougotmail.com), addresses=[Address(type=BILLING, description=My CC billing address, address1=1234 Main Street, address2=null, city=Anywhere, state=NY, postalCode=45455-66677), Address(type=SHIPPING, description=Home Sweet Home, address1=1234 Main Street, address2=null, city=Anywhere, state=NY, postalCode=45455-66677)], creditCards=[CreditCard(type=PRIMARY, description=VISA, number=4545-6767-8989-0000, expiration=7/21, nameOnCard=Mary Smith)], credentials=Credentials(username=msmith445, password=S*$475hf&*dddFFG3))' to topic='test'
+2018-05-28 19:13:39.565  INFO 22 --- [ntainer#0-0-C-1] com.storefront.kafka.Receiver            : received payload='Customer(id=5b0c54e2be41760051d00383, accountsId=null, name=Name(title=Mr., firstName=John, middleName=S., lastName=Doe, suffix=Jr.), contact=Contact(primaryPhone=555-666-7777, secondaryPhone=555-444-9898, email=john.doe@internet.com), orders=null)'
 
-2018-05-27 20:22:06.212  INFO 128 --- [ntainer#0-0-C-1] com.storefront.kafka.Receiver                : received candidate='Customer(id=5b0b136dbe417600801761c8, name=Name(title=Mr., firstName=John, middleName=S., lastName=Doe, suffix=Jr.), contact=Contact(primaryPhone=555-666-7777, secondaryPhone=555-444-9898, email=john.doe@internet.com), addresses=[Address(type=BILLING, description=My cc billing address, address1=123 Oak Street, address2=null, city=Sunrise, state=CA, postalCode=12345-6789), Address(type=SHIPPING, description=My home address, address1=123 Oak Street, address2=null, city=Sunrise, state=CA, postalCode=12345-6789)], creditCards=[CreditCard(type=PRIMARY, description=VISA, number=1234-6789-0000-0000, expiration=6/19, nameOnCard=John S. Doe), CreditCard(type=ALTERNATE, description=Corporate American Express, number=9999-8888-7777-6666, expiration=3/20, nameOnCard=John Doe)], credentials=Credentials(username=johndoe37, password=skd837#$hfh485&))'
+2018-05-28 19:13:39.725  INFO 22 --- [ntainer#0-0-C-1] org.mongodb.driver.connection            : Opened connection [connectionId{localValue:2, serverValue:41}] to mongo:27017
 
-2018-05-27 20:22:06.234  INFO 128 --- [ntainer#0-0-C-1] com.storefront.kafka.Receiver                : received candidate='Customer(id=5b0b136dbe417600801761c9, name=Name(title=Ms., firstName=Mary, middleName=null, lastName=Smith, suffix=null), contact=Contact(primaryPhone=456-789-0001, secondaryPhone=456-222-1111, email=marysmith@yougotmail.com), addresses=[Address(type=BILLING, description=My CC billing address, address1=1234 Main Street, address2=null, city=Anywhere, state=NY, postalCode=45455-66677), Address(type=SHIPPING, description=Home Sweet Home, address1=1234 Main Street, address2=null, city=Anywhere, state=NY, postalCode=45455-66677)], creditCards=[CreditCard(type=PRIMARY, description=VISA, number=4545-6767-8989-0000, expiration=7/21, nameOnCard=Mary Smith)], credentials=Credentials(username=msmith445, password=S*$475hf&*dddFFG3))'
+2018-05-28 19:13:39.836  INFO 22 --- [ntainer#0-0-C-1] com.storefront.kafka.Receiver            : received payload='Customer(id=5b0c54e3be41760051d00384, accountsId=null, name=Name(title=Ms., firstName=Mary, middleName=null, lastName=Smith, suffix=null), contact=Contact(primaryPhone=456-789-0001, secondaryPhone=456-222-1111, email=marysmith@yougotmail.com), orders=null)'
 ```
 
 Output from Kafka container using the following command.
@@ -63,16 +68,18 @@ Output from Kafka container using the following command.
 ```bash
 kafka-console-consumer.sh \
   --bootstrap-server localhost:9092 \
-  --from-beginning --topic 'test'
+  --from-beginning --topic 'accounts'
 ```
 
 Kafka Consumer Output
 
 ```text
-{"id":"5b0b136dbe417600801761c8","name":{"title":"Mr.","firstName":"John","middleName":"S.","lastName":"Doe","suffix":"Jr."},"contact":{"primaryPhone":"555-666-7777","secondaryPhone":"555-444-9898","email":"john.doe@internet.com"},"addresses":[{"type":"BILLING","description":"My cc billing address","address1":"123 Oak Street","address2":null,"city":"Sunrise","state":"CA","postalCode":"12345-6789"},{"type":"SHIPPING","description":"My home address","address1":"123 Oak Street","address2":null,"city":"Sunrise","state":"CA","postalCode":"12345-6789"}],"creditCards":[{"type":"PRIMARY","description":"VISA","number":"1234-6789-0000-0000","expiration":"6/19","nameOnCard":"John S. Doe"},{"type":"ALTERNATE","description":"Corporate American Express","number":"9999-8888-7777-6666","expiration":"3/20","nameOnCard":"John Doe"}],"credentials":{"username":"johndoe37","password":"skd837#$hfh485&"}}
+{"id":"5b0c54e2be41760051d00383","name":{"title":"Mr.","firstName":"John","middleName":"S.","lastName":"Doe","suffix":"Jr."},"contact":{"primaryPhone":"555-666-7777","secondaryPhone":"555-444-9898","email":"john.doe@internet.com"},"addresses":[{"type":"BILLING","description":"My cc billing address","address1":"123 Oak Street","address2":null,"city":"Sunrise","state":"CA","postalCode":"12345-6789"},{"type":"SHIPPING","description":"My home address","address1":"123 Oak Street","address2":null,"city":"Sunrise","state":"CA","postalCode":"12345-6789"}],"creditCards":[{"type":"PRIMARY","description":"VISA","number":"1234-6789-0000-0000","expiration":"6/19","nameOnCard":"John S. Doe"},{"type":"ALTERNATE","description":"Corporate American Express","number":"9999-8888-7777-6666","expiration":"3/20","nameOnCard":"John Doe"}],"credentials":{"username":"johndoe37","password":"skd837#$hfh485&"}}
 
-{"id":"5b0b136dbe417600801761c9","name":{"title":"Ms.","firstName":"Mary","middleName":null,"lastName":"Smith","suffix":null},"contact":{"primaryPhone":"456-789-0001","secondaryPhone":"456-222-1111","email":"marysmith@yougotmail.com"},"addresses":[{"type":"BILLING","description":"My CC billing address","address1":"1234 Main Street","address2":null,"city":"Anywhere","state":"NY","postalCode":"45455-66677"},{"type":"SHIPPING","description":"Home Sweet Home","address1":"1234 Main Street","address2":null,"city":"Anywhere","state":"NY","postalCode":"45455-66677"}],"creditCards":[{"type":"PRIMARY","description":"VISA","number":"4545-6767-8989-0000","expiration":"7/21","nameOnCard":"Mary Smith"}],"credentials":{"username":"msmith445","password":"S*$475hf&*dddFFG3"}}
+{"id":"5b0c54e3be41760051d00384","name":{"title":"Ms.","firstName":"Mary","middleName":null,"lastName":"Smith","suffix":null},"contact":{"primaryPhone":"456-789-0001","secondaryPhone":"456-222-1111","email":"marysmith@yougotmail.com"},"addresses":[{"type":"BILLING","description":"My CC billing address","address1":"1234 Main Street","address2":null,"city":"Anywhere","state":"NY","postalCode":"45455-66677"},{"type":"SHIPPING","description":"Home Sweet Home","address1":"1234 Main Street","address2":null,"city":"Anywhere","state":"NY","postalCode":"45455-66677"}],"creditCards":[{"type":"PRIMARY","description":"VISA","number":"4545-6767-8989-0000","expiration":"7/21","nameOnCard":"Mary Smith"}],"credentials":{"username":"msmith445","password":"S*$475hf&*dddFFG3"}}
 ```
+
+The `orders` topic is not used for this demo
 
 ```bash
 kafka-topics.sh --create \
