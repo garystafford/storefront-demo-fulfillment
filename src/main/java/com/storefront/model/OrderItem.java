@@ -1,26 +1,23 @@
-package com.travel.model;
+package com.storefront.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
+import java.math.BigDecimal;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Name {
+public class OrderItem {
 
     @NonNull
-    private String title;
+    private String productGuid;
 
     @NonNull
-    private String firstName;
-
-    private String middleName;
+    private Integer quantity;
 
     @NonNull
-    private String lastName;
-
-    private String suffix;
-
+    private BigDecimal unitPrice;
 }

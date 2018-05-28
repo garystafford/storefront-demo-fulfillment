@@ -1,8 +1,9 @@
-package com.travel.controller;
+package com.storefront.controller;
 
-import com.travel.Utility;
-import com.travel.model.Customer;
-import com.travel.respository.CustomerRepository;
+import com.storefront.Utility;
+import com.storefront.model.Customer;
+import com.storefront.respository.CustomerRepository;
+import com.storefront.respository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,15 +22,20 @@ public class CustomerController {
 
     private CustomerRepository customerRepository;
 
+    private ProductRepository productRepository;
+
     @Autowired
-    public CustomerController(CustomerRepository customerRepository) {
+    public CustomerController(CustomerRepository customerRepository, ProductRepository productRepository) {
         this.customerRepository = customerRepository;
+        this.productRepository = productRepository;
     }
 
     @RequestMapping(path = "/sample", method = RequestMethod.GET)
     public ResponseEntity<String> sampleData() {
-        Utility utility = new Utility(customerRepository);
-        utility.createTestData();
+        Utility utility = new Utility(customerRepository, productRepository);
+        utility.createTestProducts();
+        utility.createOrderHistory();
+//        utility.createTestCustomers();
         return new ResponseEntity("Sample data created", HttpStatus.CREATED);
     }
 

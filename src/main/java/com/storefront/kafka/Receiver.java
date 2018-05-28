@@ -1,6 +1,6 @@
-package com.travel.kafka;
+package com.storefront.kafka;
 
-import com.travel.model.Customer;
+import com.storefront.model.Customer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 
@@ -15,7 +15,7 @@ public class Receiver {
         return latch;
     }
 
-    @KafkaListener(topics = "${spring.kafka.topic.json}")
+    @KafkaListener(topics = "${spring.kafka.topic.accounts}")
     public void receive(Customer candidate) {
         log.info("received candidate='{}'", candidate.toString());
         latch.countDown();

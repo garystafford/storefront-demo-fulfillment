@@ -1,11 +1,11 @@
 spring:
   data:
     mongodb:
-      uri: mongodb://localhost:27017/accounts
+      uri: mongodb://localhost:27017/orders
   kafka:
     bootstrap-servers: localhost:9092
     topic:
-      json: test
+      accounts: accounts
     consumer:
       group-id: json
       auto-offset-reset: earliest
@@ -22,7 +22,7 @@ spring:
   profiles: dev
   data:
     mongodb:
-      uri: mongodb://mongo:27017/accounts
+      uri: mongodb://mongo:27017/orders
   kafka:
     bootstrap-servers: kafka:9092
 logging:

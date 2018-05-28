@@ -7,6 +7,8 @@
     <bytecodeTargetLevel>
       <module name="accounts_main" target="1.8" />
       <module name="accounts_test" target="1.8" />
+      <module name="orders_main" target="1.8" />
+      <module name="orders_test" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
