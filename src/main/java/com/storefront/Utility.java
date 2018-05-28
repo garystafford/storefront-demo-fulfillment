@@ -3,6 +3,7 @@ package com.storefront;
 import com.storefront.model.Order;
 import com.storefront.model.OrderItem;
 import com.storefront.model.Product;
+import com.storefront.model.Status;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -42,14 +43,14 @@ public class Utility {
         orderItems.add(new OrderItem("b506b962-fcfa-4ad6-a955-8859797edf16", 3, new BigDecimal("13.99")));
 
         List<Order> orderList = new ArrayList<>();
-        orderList.add(new Order(timestamp.getTime(), orderItems));
+        orderList.add(new Order(timestamp.getTime(), Status.COMPLETED, orderItems));
 
         orderItems = new ArrayList<>();
         orderItems.add(new OrderItem("d01fde07-7c24-49c5-a5f1-bc2ce1f14c48", 5, new BigDecimal("3.99")));
         orderItems.add(new OrderItem("4efe33a1-722d-48c8-af8e-7879edcad2fa", 2, new BigDecimal("7.99")));
         orderItems.add(new OrderItem("7f3c9c22-3c0a-47a5-9a92-2bd2e23f6e37", 4, new BigDecimal("11.99")));
 
-        orderList.add(new Order(timestamp.getTime(), orderItems));
+        orderList.add(new Order(timestamp.getTime(), Status.PROCESSING, orderItems));
 
         return orderList;
     }

@@ -19,6 +19,9 @@ public class Order {
     private Long timestamp;
 
     @NotNull
+    private Status status;
+
+    @NotNull
     private List<OrderItem> orderItems;
 
 }
