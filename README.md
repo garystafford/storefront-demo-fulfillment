@@ -16,7 +16,7 @@ I debug directly from JetBrains IntelliJ. For testing the application in develop
 
 ```bash
 # build
-./gradlew clean build -x test
+./gradlew clean build
 
 # copy
 docker cp build/libs/orders-1.0.0.jar kafka-docker_testapp_1:/orders-1.0.0.jar
@@ -31,9 +31,18 @@ apk update && apk add curl
 java -jar orders-1.0.0.jar \
     --spring.profiles.active=dev \
     --server.port=8890
+```
 
+## Creating Sample Data
+
+Create sample customers with an order history.
+```bash
+# create sample accounts customers
 curl http://localhost:8080/customers/sample
+# create sample orders products
 curl http://localhost:8890/products/sample
+# add sample order history to orders customers (received from accounts via kafka)
+curl http://localhost:8890/customers/sample
 
 ```
 
