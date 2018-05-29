@@ -1,6 +1,6 @@
 # Kafka Traveler Microservices Demo: Orders
 
-## Accounts Service
+## Orders Service
 
 Spring Boot/Kafka/Mongo Microservice, one of a set of microservices for this project. Services use Spring Kafka 2.1.6 to maintain eventually consistent data between their different `Customer` domain objects.
 
@@ -39,9 +39,12 @@ Create sample customers with an order history.
 ```bash
 # create sample accounts customers
 curl http://localhost:8080/customers/sample
+
 # create sample orders products
 curl http://localhost:8890/products/sample
-# add sample order history to orders customers (received from accounts via kafka)
+
+# add sample order history to orders customers
+# (received from kafka `accounts.customer.save` topic)
 curl http://localhost:8890/customers/sample
 
 ```
@@ -55,10 +58,81 @@ ede27d4c993b        mongo:latest                    "docker-entrypoint.s…"   2
 fde71dcb89be        wurstmeister/kafka:latest       "start-kafka.sh"         21 hours ago        Up 21 hours         0.0.0.0:9092->9092/tcp                               kafka-docker_kafka_1
 538397f51320        wurstmeister/zookeeper:latest   "/bin/sh -c '/usr/sb…"   21 hours ago        Up 21 hours         22/tcp, 2888/tcp, 3888/tcp, 0.0.0.0:2181->2181/tcp   kafka-docker_zookeeper_1
 ```
+## Orders Customer Object in MongoDB
+
+`db.customer.find().pretty();`
+
+```bson
+{
+	"_id" : ObjectId("5b0c54e2be41760051d00383"),
+	"name" : {
+		"title" : "Mr.",
+		"firstName" : "John",
+		"middleName" : "S.",
+		"lastName" : "Doe",
+		"suffix" : "Jr."
+	},
+	"contact" : {
+		"primaryPhone" : "555-666-7777",
+		"secondaryPhone" : "555-444-9898",
+		"email" : "john.doe@internet.com"
+	},
+	"orders" : [
+		{
+			"timestamp" : NumberLong("1527538871249"),
+			"status" : "COMPLETED",
+			"orderItems" : [
+				{
+					"productGuid" : "b5efd4a0-4eb9-4ad0-bc9e-2f5542cbe897",
+					"quantity" : 2,
+					"unitPrice" : "1.99"
+				},
+				{
+					"productGuid" : "a9d5a5c7-4245-4b4e-b1c3-1d3968f36b2d",
+					"quantity" : 4,
+					"unitPrice" : "5.99"
+				},
+				{
+					"productGuid" : "f3b9bdce-10d8-4c22-9861-27149879b3c1",
+					"quantity" : 1,
+					"unitPrice" : "9.99"
+				},
+				{
+					"productGuid" : "b506b962-fcfa-4ad6-a955-8859797edf16",
+					"quantity" : 3,
+					"unitPrice" : "13.99"
+				}
+			]
+		},
+		{
+			"timestamp" : NumberLong("1527538871249"),
+			"status" : "PROCESSING",
+			"orderItems" : [
+				{
+					"productGuid" : "d01fde07-7c24-49c5-a5f1-bc2ce1f14c48",
+					"quantity" : 5,
+					"unitPrice" : "3.99"
+				},
+				{
+					"productGuid" : "4efe33a1-722d-48c8-af8e-7879edcad2fa",
+					"quantity" : 2,
+					"unitPrice" : "7.99"
+				},
+				{
+					"productGuid" : "7f3c9c22-3c0a-47a5-9a92-2bd2e23f6e37",
+					"quantity" : 4,
+					"unitPrice" : "11.99"
+				}
+			]
+		}
+	],
+	"_class" : "com.storefront.model.Customer"
+}
+```
 
 ## Current Results
 
-Output from application, on the `accounts` topic
+Output from application, on the `accounts.customer.save` topic
 
 ```text
 2018-05-28 19:11:19.383  INFO 22 --- [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-1, groupId=json] Setting newly assigned partitions [accounts-0]
@@ -77,7 +151,7 @@ Output from Kafka container using the following command.
 ```bash
 kafka-console-consumer.sh \
   --bootstrap-server localhost:9092 \
-  --from-beginning --topic 'accounts'
+  --from-beginning --topic accounts.customer.save
 ```
 
 Kafka Consumer Output
@@ -88,13 +162,13 @@ Kafka Consumer Output
 {"id":"5b0c54e3be41760051d00384","name":{"title":"Ms.","firstName":"Mary","middleName":null,"lastName":"Smith","suffix":null},"contact":{"primaryPhone":"456-789-0001","secondaryPhone":"456-222-1111","email":"marysmith@yougotmail.com"},"addresses":[{"type":"BILLING","description":"My CC billing address","address1":"1234 Main Street","address2":null,"city":"Anywhere","state":"NY","postalCode":"45455-66677"},{"type":"SHIPPING","description":"Home Sweet Home","address1":"1234 Main Street","address2":null,"city":"Anywhere","state":"NY","postalCode":"45455-66677"}],"creditCards":[{"type":"PRIMARY","description":"VISA","number":"4545-6767-8989-0000","expiration":"7/21","nameOnCard":"Mary Smith"}],"credentials":{"username":"msmith445","password":"S*$475hf&*dddFFG3"}}
 ```
 
-The `orders` topic is not used for this demo
+The `orders.order.save` topic is not used for this demo
 
 ```bash
 kafka-topics.sh --create \
   --zookeeper zookeeper:2181 \
   --replication-factor 1 --partitions 1 \
-  --topic orders
+  --topic orders.order.save
 ```
 
 ## References
