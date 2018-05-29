@@ -15,6 +15,9 @@ For [Kakfa](https://kafka.apache.org/), I use my [garystafford/kafka-docker](htt
 I debug directly from JetBrains IntelliJ. For testing the application in development, I build the jar, copy it to Alpine Linux OpenJDK `testapp` container, and run it. If testing more than one service in the same testapp container, make sure ports don't collide. Start services on different ports.
 
 ```bash
+# start container if stopped
+docker start kafka-docker_testapp_1
+
 # build
 ./gradlew clean build
 
@@ -135,15 +138,17 @@ fde71dcb89be        wurstmeister/kafka:latest       "start-kafka.sh"         21 
 Output from application, on the `accounts.customer.save` topic
 
 ```text
-2018-05-28 19:11:19.383  INFO 22 --- [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-1, groupId=json] Setting newly assigned partitions [accounts-0]
+2018-05-29 00:41:24.652  INFO 117 --- [ntainer#0-0-C-1] o.a.k.c.c.internals.AbstractCoordinator  : [Consumer clientId=consumer-1, groupId=orders] Successfully joined group with generation 1
 
-2018-05-28 19:11:19.388  INFO 22 --- [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : partitions assigned: [accounts-0]
+2018-05-29 00:41:24.674  INFO 117 --- [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-1, groupId=orders] Setting newly assigned partitions [accounts.customer.save-0]
 
-2018-05-28 19:13:39.565  INFO 22 --- [ntainer#0-0-C-1] com.storefront.kafka.Receiver            : received payload='Customer(id=5b0c54e2be41760051d00383, accountsId=null, name=Name(title=Mr., firstName=John, middleName=S., lastName=Doe, suffix=Jr.), contact=Contact(primaryPhone=555-666-7777, secondaryPhone=555-444-9898, email=john.doe@internet.com), orders=null)'
+2018-05-29 00:41:24.724  INFO 117 --- [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : partitions assigned: [accounts.customer.save-0]
 
-2018-05-28 19:13:39.725  INFO 22 --- [ntainer#0-0-C-1] org.mongodb.driver.connection            : Opened connection [connectionId{localValue:2, serverValue:41}] to mongo:27017
+2018-05-29 00:43:29.385  INFO 117 --- [ntainer#0-0-C-1] com.storefront.kafka.Receiver            : received payload='Customer(id=5b0ca230be4176002f61999f, name=Name(title=Mr., firstName=John, middleName=S., lastName=Doe, suffix=Jr.), contact=Contact(primaryPhone=555-666-7777, secondaryPhone=555-444-9898, email=john.doe@internet.com), orders=null)'
 
-2018-05-28 19:13:39.836  INFO 22 --- [ntainer#0-0-C-1] com.storefront.kafka.Receiver            : received payload='Customer(id=5b0c54e3be41760051d00384, accountsId=null, name=Name(title=Ms., firstName=Mary, middleName=null, lastName=Smith, suffix=null), contact=Contact(primaryPhone=456-789-0001, secondaryPhone=456-222-1111, email=marysmith@yougotmail.com), orders=null)'
+2018-05-29 00:43:29.606  INFO 117 --- [ntainer#0-0-C-1] org.mongodb.driver.connection            : Opened connection [connectionId{localValue:2, serverValue:54}] to mongo:27017
+
+2018-05-29 00:43:29.661  INFO 117 --- [ntainer#0-0-C-1] com.storefront.kafka.Receiver            : received payload='Customer(id=5b0ca230be4176002f6199a0, name=Name(title=Ms., firstName=Mary, middleName=null, lastName=Smith, suffix=null), contact=Contact(primaryPhone=456-789-0001, secondaryPhone=456-222-1111, email=marysmith@yougotmail.com), orders=null)'
 ```
 
 Output from Kafka container using the following command.
@@ -157,9 +162,9 @@ kafka-console-consumer.sh \
 Kafka Consumer Output
 
 ```text
-{"id":"5b0c54e2be41760051d00383","name":{"title":"Mr.","firstName":"John","middleName":"S.","lastName":"Doe","suffix":"Jr."},"contact":{"primaryPhone":"555-666-7777","secondaryPhone":"555-444-9898","email":"john.doe@internet.com"},"addresses":[{"type":"BILLING","description":"My cc billing address","address1":"123 Oak Street","address2":null,"city":"Sunrise","state":"CA","postalCode":"12345-6789"},{"type":"SHIPPING","description":"My home address","address1":"123 Oak Street","address2":null,"city":"Sunrise","state":"CA","postalCode":"12345-6789"}],"creditCards":[{"type":"PRIMARY","description":"VISA","number":"1234-6789-0000-0000","expiration":"6/19","nameOnCard":"John S. Doe"},{"type":"ALTERNATE","description":"Corporate American Express","number":"9999-8888-7777-6666","expiration":"3/20","nameOnCard":"John Doe"}],"credentials":{"username":"johndoe37","password":"skd837#$hfh485&"}}
+{"id":"5b0ca230be4176002f61999f","name":{"title":"Mr.","firstName":"John","middleName":"S.","lastName":"Doe","suffix":"Jr."},"contact":{"primaryPhone":"555-666-7777","secondaryPhone":"555-444-9898","email":"john.doe@internet.com"},"addresses":[{"type":"BILLING","description":"My cc billing address","address1":"123 Oak Street","address2":null,"city":"Sunrise","state":"CA","postalCode":"12345-6789"},{"type":"SHIPPING","description":"My home address","address1":"123 Oak Street","address2":null,"city":"Sunrise","state":"CA","postalCode":"12345-6789"}],"creditCards":[{"type":"PRIMARY","description":"VISA","number":"1234-6789-0000-0000","expiration":"6/19","nameOnCard":"John S. Doe"},{"type":"ALTERNATE","description":"Corporate American Express","number":"9999-8888-7777-6666","expiration":"3/20","nameOnCard":"John Doe"}],"credentials":{"username":"johndoe37","password":"skd837#$hfh485&"}}
 
-{"id":"5b0c54e3be41760051d00384","name":{"title":"Ms.","firstName":"Mary","middleName":null,"lastName":"Smith","suffix":null},"contact":{"primaryPhone":"456-789-0001","secondaryPhone":"456-222-1111","email":"marysmith@yougotmail.com"},"addresses":[{"type":"BILLING","description":"My CC billing address","address1":"1234 Main Street","address2":null,"city":"Anywhere","state":"NY","postalCode":"45455-66677"},{"type":"SHIPPING","description":"Home Sweet Home","address1":"1234 Main Street","address2":null,"city":"Anywhere","state":"NY","postalCode":"45455-66677"}],"creditCards":[{"type":"PRIMARY","description":"VISA","number":"4545-6767-8989-0000","expiration":"7/21","nameOnCard":"Mary Smith"}],"credentials":{"username":"msmith445","password":"S*$475hf&*dddFFG3"}}
+{"id":"5b0ca230be4176002f6199a0","name":{"title":"Ms.","firstName":"Mary","middleName":null,"lastName":"Smith","suffix":null},"contact":{"primaryPhone":"456-789-0001","secondaryPhone":"456-222-1111","email":"marysmith@yougotmail.com"},"addresses":[{"type":"BILLING","description":"My CC billing address","address1":"1234 Main Street","address2":null,"city":"Anywhere","state":"NY","postalCode":"45455-66677"},{"type":"SHIPPING","description":"Home Sweet Home","address1":"1234 Main Street","address2":null,"city":"Anywhere","state":"NY","postalCode":"45455-66677"}],"creditCards":[{"type":"PRIMARY","description":"VISA","number":"4545-6767-8989-0000","expiration":"7/21","nameOnCard":"Mary Smith"}],"credentials":{"username":"msmith445","password":"S*$475hf&*dddFFG3"}}
 ```
 
 The `orders.order.save` topic is not used for this demo
