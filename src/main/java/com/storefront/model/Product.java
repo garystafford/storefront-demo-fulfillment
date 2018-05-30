@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor
-@Document
+@Document(collection = "products")
 public class Product {
 
     @Id

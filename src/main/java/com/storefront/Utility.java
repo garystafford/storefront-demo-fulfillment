@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @Component
 public class Utility {
@@ -34,24 +35,48 @@ public class Utility {
 
     public static List<Order> createSampleOrderHistory() {
 
+        List<Product> productList = createSampleProducts();
+
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
+        // Random Order #1
         List<OrderItem> orderItems = new ArrayList<>();
-        orderItems.add(new OrderItem("b5efd4a0-4eb9-4ad0-bc9e-2f5542cbe897", 2, new BigDecimal("1.99")));
-        orderItems.add(new OrderItem("a9d5a5c7-4245-4b4e-b1c3-1d3968f36b2d", 4, new BigDecimal("5.99")));
-        orderItems.add(new OrderItem("f3b9bdce-10d8-4c22-9861-27149879b3c1", 1, new BigDecimal("9.99")));
-        orderItems.add(new OrderItem("b506b962-fcfa-4ad6-a955-8859797edf16", 3, new BigDecimal("13.99")));
-
+        for (int i = 0; i < randomProductQuantity(); i++) {
+            orderItems.add(new OrderItem(productList.get(randomProductListItem()), randomProductQuantity()));
+        }
         List<Order> orderList = new ArrayList<>();
         orderList.add(new Order(timestamp.getTime(), Status.COMPLETED, orderItems));
 
+        // Random Order #2
         orderItems = new ArrayList<>();
-        orderItems.add(new OrderItem("d01fde07-7c24-49c5-a5f1-bc2ce1f14c48", 5, new BigDecimal("3.99")));
-        orderItems.add(new OrderItem("4efe33a1-722d-48c8-af8e-7879edcad2fa", 2, new BigDecimal("7.99")));
-        orderItems.add(new OrderItem("7f3c9c22-3c0a-47a5-9a92-2bd2e23f6e37", 4, new BigDecimal("11.99")));
+        for (int i = 0; i < randomProductQuantity(); i++) {
+            orderItems.add(new OrderItem(productList.get(randomProductListItem()), randomProductQuantity()));
+        }
+        orderList.add(new Order(timestamp.getTime(), Status.PROCESSING, orderItems));
 
+        // Random Order #3
+        orderItems = new ArrayList<>();
+        for (int i = 0; i < randomProductQuantity(); i++) {
+            orderItems.add(new OrderItem(productList.get(randomProductListItem()), randomProductQuantity()));
+        }
         orderList.add(new Order(timestamp.getTime(), Status.PROCESSING, orderItems));
 
         return orderList;
+    }
+
+    private static int randomProductListItem() {
+
+        // 0 - 7
+        Random rand = new Random();
+        return rand.nextInt(7);
+    }
+
+    private static int randomProductQuantity() {
+
+        // 1 - 5
+        int min = 1;
+        int max = 5;
+        Random rand = new Random();
+        return rand.nextInt((max - min) + 1) + min;
     }
 }
