@@ -1,6 +1,6 @@
-# Kafka Traveler Microservices Demo: Orders
+# Kafka Traveler Microservices Demo: Fulfillment
 
-## Orders Service
+## Fulfillment Service
 
 Spring Boot/Kafka/Mongo Microservice, one of a set of microservices for this project. Services use Spring Kafka 2.1.6 to maintain eventually consistent data between their different `Customer` domain objects.
 
@@ -22,7 +22,7 @@ docker start kafka-docker_testapp_1
 ./gradlew clean build
 
 # copy
-docker cp build/libs/orders-1.0.0.jar kafka-docker_testapp_1:/orders-1.0.0.jar
+docker cp build/libs/fulfillment-1.0.0.jar kafka-docker_testapp_1:/fulfillment-1.0.0.jar
 docker exec -it kafka-docker_testapp_1 sh
 
 # install curl
@@ -31,7 +31,7 @@ apk update && apk add curl
 # start with 'dev' profile
 # same testapp container as accounts,
 # so start on different port
-java -jar orders-1.0.0.jar \
+java -jar fulfillment-1.0.0.jar \
     --spring.profiles.active=dev \
     --server.port=8890
 ```
@@ -43,10 +43,10 @@ Create sample customers with an order history.
 # create sample accounts customers
 curl http://localhost:8080/customers/sample
 
-# create sample orders products
+# create sample fulfillment products
 curl http://localhost:8890/products/sample
 
-# add sample order history to orders customers
+# add sample order history to fulfillment customers
 # (received from kafka `accounts.customer.save` topic)
 curl http://localhost:8890/customers/sample
 
@@ -61,7 +61,7 @@ ede27d4c993b        mongo:latest                    "docker-entrypoint.s…"   2
 fde71dcb89be        wurstmeister/kafka:latest       "start-kafka.sh"         21 hours ago        Up 21 hours         0.0.0.0:9092->9092/tcp                               kafka-docker_kafka_1
 538397f51320        wurstmeister/zookeeper:latest   "/bin/sh -c '/usr/sb…"   21 hours ago        Up 21 hours         22/tcp, 2888/tcp, 3888/tcp, 0.0.0.0:2181->2181/tcp   kafka-docker_zookeeper_1
 ```
-## Orders Customer Object in MongoDB
+## Fulfillment Customer Object in MongoDB
 
 `db.customer.find().pretty();`
 
@@ -80,7 +80,7 @@ fde71dcb89be        wurstmeister/kafka:latest       "start-kafka.sh"         21 
 		"secondaryPhone" : "555-444-9898",
 		"email" : "john.doe@internet.com"
 	},
-	"orders" : [
+	"fulfillment" : [
 		{
 			"timestamp" : NumberLong("1527538871249"),
 			"status" : "COMPLETED",
@@ -138,12 +138,12 @@ fde71dcb89be        wurstmeister/kafka:latest       "start-kafka.sh"         21 
 Output from application, on the `accounts.customer.save` topic
 
 ```text
-2018-05-29 02:14:29.774  INFO [-,,,] 312 --- [ntainer#0-0-C-1] o.a.k.c.c.internals.AbstractCoordinator  : [Consumer clientId=consumer-1, groupId=orders] Successfully joined group with generation 3
-2018-05-29 02:14:29.782  INFO [-,,,] 312 --- [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-1, groupId=orders] Setting newly assigned partitions [accounts.customer.save-0]
+2018-05-29 02:14:29.774  INFO [-,,,] 312 --- [ntainer#0-0-C-1] o.a.k.c.c.internals.AbstractCoordinator  : [Consumer clientId=consumer-1, groupId=fulfillment] Successfully joined group with generation 3
+2018-05-29 02:14:29.782  INFO [-,,,] 312 --- [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-1, groupId=fulfillment] Setting newly assigned partitions [accounts.customer.save-0]
 2018-05-29 02:14:29.789  INFO [-,,,] 312 --- [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : partitions assigned: [accounts.customer.save-0]
 2018-05-29 02:15:25.098  INFO [-,c7948d1dffbfabea,c7948d1dffbfabea,false] 312 --- [nio-8890-exec-1] org.mongodb.driver.connection            : Opened connection [connectionId{localValue:2, serverValue:59}] to mongo:27017
-2018-05-29 02:16:09.902  INFO [-,905beb7476b150df,90f3b6934989d2ae,false] 312 --- [ntainer#0-0-C-1] com.storefront.kafka.Receiver            : received payload='Customer(id=5b0cb7e9be417600fda8c707, name=Name(title=Mr., firstName=John, middleName=S., lastName=Doe, suffix=Jr.), contact=Contact(primaryPhone=555-666-7777, secondaryPhone=555-444-9898, email=john.doe@internet.com), orders=null)'
-2018-05-29 02:16:09.920  INFO [-,905beb7476b150df,503afeb73b072ac4,false] 312 --- [ntainer#0-0-C-1] com.storefront.kafka.Receiver            : received payload='Customer(id=5b0cb7e9be417600fda8c708, name=Name(title=Ms., firstName=Mary, middleName=null, lastName=Smith, suffix=null), contact=Contact(primaryPhone=456-789-0001, secondaryPhone=456-222-1111, email=marysmith@yougotmail.com), orders=null)'
+2018-05-29 02:16:09.902  INFO [-,905beb7476b150df,90f3b6934989d2ae,false] 312 --- [ntainer#0-0-C-1] com.storefront.kafka.Receiver            : received payload='Customer(id=5b0cb7e9be417600fda8c707, name=Name(title=Mr., firstName=John, middleName=S., lastName=Doe, suffix=Jr.), contact=Contact(primaryPhone=555-666-7777, secondaryPhone=555-444-9898, email=john.doe@internet.com), fulfillment=null)'
+2018-05-29 02:16:09.920  INFO [-,905beb7476b150df,503afeb73b072ac4,false] 312 --- [ntainer#0-0-C-1] com.storefront.kafka.Receiver            : received payload='Customer(id=5b0cb7e9be417600fda8c708, name=Name(title=Ms., firstName=Mary, middleName=null, lastName=Smith, suffix=null), contact=Contact(primaryPhone=456-789-0001, secondaryPhone=456-222-1111, email=marysmith@yougotmail.com), fulfillment=null)'
 ```
 
 Output from Kafka container using the following command.
@@ -161,13 +161,13 @@ Kafka Consumer Output
 {"id":"5b0ca230be4176002f6199a0","name":{"title":"Ms.","firstName":"Mary","middleName":null,"lastName":"Smith","suffix":null},"contact":{"primaryPhone":"456-789-0001","secondaryPhone":"456-222-1111","email":"marysmith@yougotmail.com"},"addresses":[{"type":"BILLING","description":"My CC billing address","address1":"1234 Main Street","address2":null,"city":"Anywhere","state":"NY","postalCode":"45455-66677"},{"type":"SHIPPING","description":"Home Sweet Home","address1":"1234 Main Street","address2":null,"city":"Anywhere","state":"NY","postalCode":"45455-66677"}],"creditCards":[{"type":"PRIMARY","description":"VISA","number":"4545-6767-8989-0000","expiration":"7/21","nameOnCard":"Mary Smith"}],"credentials":{"username":"msmith445","password":"S*$475hf&*dddFFG3"}}
 ```
 
-The `orders.order.save` topic is not used for this demo
+The `fulfillment.order.save` topic is not used for this demo
 
 ```bash
 kafka-topics.sh --create \
   --zookeeper zookeeper:2181 \
   --replication-factor 1 --partitions 1 \
-  --topic orders.order.save
+  --topic fulfillment.order.save
 ```
 
 ## References

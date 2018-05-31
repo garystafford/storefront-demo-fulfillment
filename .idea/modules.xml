@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/orders.iml" filepath="$PROJECT_DIR$/.idea/modules/orders.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/orders_main.iml" filepath="$PROJECT_DIR$/.idea/modules/orders_main.iml" group="orders" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/orders_test.iml" filepath="$PROJECT_DIR$/.idea/modules/orders_test.iml" group="orders" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/fulfillment.iml" filepath="$PROJECT_DIR$/.idea/modules/fulfillment.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/fulfillment_main.iml" filepath="$PROJECT_DIR$/.idea/modules/fulfillment_main.iml" group="fulfillment" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/fulfillment_test.iml" filepath="$PROJECT_DIR$/.idea/modules/fulfillment_test.iml" group="fulfillment" />
     </modules>
   </component>
 </project>

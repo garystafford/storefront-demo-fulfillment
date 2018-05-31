@@ -1,7 +1,7 @@
 spring:
   data:
     mongodb:
-      uri: mongodb://localhost:27017/orders
+      uri: mongodb://localhost:27017/fulfillment
   kafka:
     bootstrap-servers: localhost:9092
     topic:
@@ -9,7 +9,7 @@ spring:
       orders-order: orders.order.change
       fulfillment-orders: fulfillment.order.change
     consumer:
-      group-id: orders
+      group-id: fulfillment
       auto-offset-reset: earliest
 management:
   endpoints:
@@ -24,7 +24,7 @@ spring:
   profiles: dev
   data:
     mongodb:
-      uri: mongodb://mongo:27017/orders
+      uri: mongodb://mongo:27017/fulfillment
   kafka:
     bootstrap-servers: kafka:9092
 logging:
