@@ -22,7 +22,7 @@ public class Receiver {
         return latch;
     }
 
-    @KafkaListener(topics = "${spring.kafka.topic.accounts-customer}")
+    @KafkaListener(topics = "${spring.kafka.topic.order-orders}")
     public void receive(Customer candidate) {
         log.info("received payload='{}'", candidate.toString());
         latch.countDown();

@@ -12,7 +12,6 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor
-@Document(collection = "customer.orders")
 public class Customer {
 
     @Id
@@ -25,5 +24,5 @@ public class Customer {
     private Contact contact;
 
     @NonNull
-    private List<Order> orders;
+    private List<Address> addresses;
 }
