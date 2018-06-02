@@ -1,6 +1,6 @@
 package com.storefront.model;
 
-public enum Status {
+public enum OrderStatus {
     PENDING,
     FAILED,
     PROCESSING,

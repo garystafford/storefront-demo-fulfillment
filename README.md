@@ -33,7 +33,8 @@ apk update && apk add curl
 # so start on different port
 java -jar fulfillment-1.0.0.jar \
     --spring.profiles.active=dev \
-    --server.port=8095
+    --server.port=8095 \
+    --logging.level.root=DEBUG
 ```
 
 ## Creating Sample Data
@@ -44,30 +45,35 @@ Create sample customers with an order history.
 curl http://localhost:8080/customers/sample
 
 # create sample fulfillment products
-curl http://localhost:8890/products/sample
+curl http://localhost:8090/products/sample
 
 # add sample order history to fulfillment customers
 # (received from kafka `accounts.customer.save` topic)
-curl http://localhost:8890/customers/sample
+curl http://localhost:8090/customers/samples
+curl http://localhost:8090/customers/sample
+curl http://localhost:8090/customers/fulfill
 
 ```
 
 ## Container Infrastructure
 
 ```text
-CONTAINER ID        IMAGE                           COMMAND                  CREATED             STATUS              PORTS                                                NAMES
-f11b56e51d57        openjdk:8u151-jdk-alpine3.7     "sleep 6000"             4 seconds ago       Up 3 seconds                                                             kafka-docker_testapp_1
-ede27d4c993b        mongo:latest                    "docker-entrypoint.s…"   21 hours ago        Up 21 hours         0.0.0.0:27017->27017/tcp                             kafka-docker_mongo_1
-fde71dcb89be        wurstmeister/kafka:latest       "start-kafka.sh"         21 hours ago        Up 21 hours         0.0.0.0:9092->9092/tcp                               kafka-docker_kafka_1
-538397f51320        wurstmeister/zookeeper:latest   "/bin/sh -c '/usr/sb…"   21 hours ago        Up 21 hours         22/tcp, 2888/tcp, 3888/tcp, 0.0.0.0:2181->2181/tcp   kafka-docker_zookeeper_1
+CONTAINER ID        IMAGE                            COMMAND                  CREATED             STATUS              PORTS                                                NAMES
+6079603c5d92        openjdk:8u151-jdk-alpine3.7      "sleep 6000"             4 hours ago         Up About an hour                                                         kafka-docker_testapp_1
+df8914058cbb        hlebalbau/kafka-manager:latest   "/kafka-manager/bin/…"   4 hours ago         Up 4 hours          0.0.0.0:9000->9000/tcp                               kafka-docker_kafka_manager_1
+5cd8f61330e0        wurstmeister/kafka:latest        "start-kafka.sh"         4 hours ago         Up 4 hours          0.0.0.0:9092->9092/tcp                               kafka-docker_kafka_1
+497901621c7d        mongo:latest                     "docker-entrypoint.s…"   4 hours ago         Up 4 hours          0.0.0.0:27017->27017/tcp                             kafka-docker_mongo_1
+9079612e36ad        wurstmeister/zookeeper:latest    "/bin/sh -c '/usr/sb…"   4 hours ago         Up 4 hours          22/tcp, 2888/tcp, 3888/tcp, 0.0.0.0:2181->2181/tcp   kafka-docker_zookeeper_1
 ```
+
 ## Fulfillment Customer Object in MongoDB
 
-`db.customer.find().pretty();`
+`db.fulfillment.requests.find().pretty();`
 
 ```bson
 {
-	"_id" : ObjectId("5b0c54e2be41760051d00383"),
+	"_id" : ObjectId("5b12035fbe417602e6b6a2bc"),
+	"timestamp" : NumberLong("1527907166230"),
 	"name" : {
 		"title" : "Mr.",
 		"firstName" : "John",
@@ -80,56 +86,29 @@ fde71dcb89be        wurstmeister/kafka:latest       "start-kafka.sh"         21 
 		"secondaryPhone" : "555-444-9898",
 		"email" : "john.doe@internet.com"
 	},
-	"fulfillment" : [
-		{
-			"timestamp" : NumberLong("1527538871249"),
-			"status" : "COMPLETED",
-			"orderItems" : [
-				{
-					"productGuid" : "b5efd4a0-4eb9-4ad0-bc9e-2f5542cbe897",
-					"quantity" : 2,
-					"unitPrice" : "1.99"
+	"address" : {
+		"type" : "SHIPPING",
+		"description" : "My home address",
+		"address1" : "123 Oak Street",
+		"city" : "Sunrise",
+		"state" : "CA",
+		"postalCode" : "12345-6789"
+	},
+	"order" : {
+		"timestamp" : NumberLong("1527902833631"),
+		"orderItems" : [
+			{
+				"product" : {
+					"guid" : "b506b962-fcfa-4ad6-a955-8859797edf16",
+					"title" : "Black Widget",
+					"description" : "Lovely Black Widget",
+					"price" : "13.99"
 				},
-				{
-					"productGuid" : "a9d5a5c7-4245-4b4e-b1c3-1d3968f36b2d",
-					"quantity" : 4,
-					"unitPrice" : "5.99"
-				},
-				{
-					"productGuid" : "f3b9bdce-10d8-4c22-9861-27149879b3c1",
-					"quantity" : 1,
-					"unitPrice" : "9.99"
-				},
-				{
-					"productGuid" : "b506b962-fcfa-4ad6-a955-8859797edf16",
-					"quantity" : 3,
-					"unitPrice" : "13.99"
-				}
-			]
-		},
-		{
-			"timestamp" : NumberLong("1527538871249"),
-			"status" : "PROCESSING",
-			"orderItems" : [
-				{
-					"productGuid" : "d01fde07-7c24-49c5-a5f1-bc2ce1f14c48",
-					"quantity" : 5,
-					"unitPrice" : "3.99"
-				},
-				{
-					"productGuid" : "4efe33a1-722d-48c8-af8e-7879edcad2fa",
-					"quantity" : 2,
-					"unitPrice" : "7.99"
-				},
-				{
-					"productGuid" : "7f3c9c22-3c0a-47a5-9a92-2bd2e23f6e37",
-					"quantity" : 4,
-					"unitPrice" : "11.99"
-				}
-			]
-		}
-	],
-	"_class" : "com.storefront.model.Customer"
+				"quantity" : 2
+			}
+		]
+	},
+	"_class" : "com.storefront.model.FulfillmentRequest"
 }
 ```
 

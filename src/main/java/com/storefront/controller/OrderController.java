@@ -1,7 +1,7 @@
 package com.storefront.controller;
 
-import com.storefront.model.Order;
-import com.storefront.respository.OrderRepository;
+import com.storefront.model.FulfillmentRequest;
+import com.storefront.respository.FulfillmentRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,15 +15,15 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/orders")
+@RequestMapping("/fulfillmentRequests")
 public class OrderController {
 
-    private OrderRepository orderRepository;
+    private FulfillmentRequestRepository fulfillmentRequestRepository;
 
 
     @Autowired
-    public OrderController(OrderRepository orderRepository) {
-        this.orderRepository = orderRepository;
+    public OrderController(FulfillmentRequestRepository fulfillmentRequestRepository) {
+        this.fulfillmentRequestRepository = fulfillmentRequestRepository;
     }
 
     @RequestMapping(path = "/sample", method = RequestMethod.GET)
@@ -42,9 +42,9 @@ public class OrderController {
 
     @RequestMapping(path = "/summary", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<Map<String, List<Order>>> orderSummary() {
+    public ResponseEntity<Map<String, List<FulfillmentRequest>>> orderSummary() {
 
-        List<Order> orderList = orderRepository.findAll();
-        return new ResponseEntity<>(Collections.singletonMap("orders", orderList), HttpStatus.OK);
+        List<FulfillmentRequest> fulfillmentRequestList = fulfillmentRequestRepository.findAll();
+        return new ResponseEntity<>(Collections.singletonMap("fulfillmentRequests", fulfillmentRequestList), HttpStatus.OK);
     }
 }
