@@ -1,7 +1,7 @@
 package com.storefront.kafka;
 
-import com.storefront.model.Customer;
-import com.storefront.respository.CustomerRepository;
+import com.storefront.model.Order;
+import com.storefront.respository.OrderRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -14,7 +14,7 @@ import java.util.concurrent.CountDownLatch;
 public class Receiver {
 
     @Autowired
-    private CustomerRepository customerRepository;
+    private OrderRepository orderRepository;
 
     private CountDownLatch latch = new CountDownLatch(1);
 
@@ -22,11 +22,11 @@ public class Receiver {
         return latch;
     }
 
-    @KafkaListener(topics = "${spring.kafka.topic.order-orders}")
-    public void receive(Customer candidate) {
-        log.info("received payload='{}'", candidate.toString());
+    @KafkaListener(topics = "${spring.kafka.topic.orders-order}")
+    public void receive(Order order) {
+        log.info("received payload='{}'", order.toString());
         latch.countDown();
 
-        customerRepository.save(candidate);
+        orderRepository.save(order);
     }
 }
