@@ -7,7 +7,7 @@ import lombok.NonNull;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -18,7 +18,7 @@ public class FulfillmentRequest {
     @Id
     private String id;
 
-    @NotNull
+    @NonNull
     private Long timestamp;
 
     @NonNull
@@ -30,7 +30,14 @@ public class FulfillmentRequest {
     @NonNull
     private Address address;
 
-    @NotNull
+    @NonNull
     private Order order;
+
+    @NonNull
+    private ShippingMethod shippingMethod;
+
+    @NonNull
+    private List<ShippingStatusEvent> shippingStatusEvents;
+
 
 }

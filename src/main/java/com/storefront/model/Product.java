@@ -15,18 +15,9 @@ import java.math.BigDecimal;
 @Document(collection = "products")
 public class Product {
 
-    @Id
-    private String id;
-
     @NonNull
     private String guid;
 
     @NonNull
     private String title;
-
-    @NonNull
-    private String description;
-
-    @NonNull
-    private BigDecimal price;
 }

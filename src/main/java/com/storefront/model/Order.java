@@ -3,8 +3,8 @@ package com.storefront.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Data
@@ -12,12 +12,10 @@ import java.util.List;
 @AllArgsConstructor
 public class Order {
 
-    @NotNull
-    private Long timestamp;
+    @NonNull
+    private List<OrderStatusEvent> orderStatusEvents;
 
-    @NotNull
-    private OrderStatus orderStatus;
-
-    @NotNull
+    @NonNull
     private List<OrderItem> orderItems;
+
 }
