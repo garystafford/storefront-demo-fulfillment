@@ -19,11 +19,13 @@ public class Receiver {
     private CountDownLatch latch = new CountDownLatch(1);
 
     public CountDownLatch getLatch() {
+
         return latch;
     }
 
     @KafkaListener(topics = "${spring.kafka.topic.orders-order}")
     public void receive(FulfillmentRequest fulfillmentRequest) {
+
         log.info("received payload='{}'", fulfillmentRequest.toString());
         latch.countDown();
 

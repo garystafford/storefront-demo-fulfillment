@@ -9,7 +9,7 @@ spring:
     topic:
       accounts-customer: accounts.customer.change
       orders-order: orders.order.fulfill
-      fulfillment-orders: fulfillment.order.change
+      fulfillment-order: fulfillment.order.change
     consumer:
       group-id: fulfillment
       auto-offset-reset: earliest

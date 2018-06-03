@@ -31,6 +31,7 @@ public class ReceiverConfig {
 
     @Bean
     public Map<String, Object> consumerConfigs() {
+
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
@@ -43,12 +44,14 @@ public class ReceiverConfig {
 
     @Bean
     public ConsumerFactory<String, FulfillmentRequest> consumerFactory() {
+
         return new DefaultKafkaConsumerFactory<>(consumerConfigs(), new StringDeserializer(),
                 new JsonDeserializer<>(FulfillmentRequest.class));
     }
 
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, FulfillmentRequest> kafkaListenerContainerFactory() {
+
         ConcurrentKafkaListenerContainerFactory<String, FulfillmentRequest> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
@@ -58,6 +61,7 @@ public class ReceiverConfig {
 
     @Bean
     public Receiver receiver() {
+
         return new Receiver();
     }
 }
