@@ -39,5 +39,4 @@ public class FulfillmentRequest {
     @NonNull
     private List<ShippingStatusEvent> shippingStatusEvents;
 
-
 }

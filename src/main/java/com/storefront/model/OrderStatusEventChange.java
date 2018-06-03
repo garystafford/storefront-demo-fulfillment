@@ -5,20 +5,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
-import java.util.List;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Order {
+public class OrderStatusEventChange {
 
     @NonNull
     private String guid;
 
     @NonNull
-    private List<OrderStatusEvent> orderStatusEvents;
-
-    @NonNull
-    private List<OrderItem> orderItems;
+    private OrderStatusEvent orderStatusEvent;
 
 }
