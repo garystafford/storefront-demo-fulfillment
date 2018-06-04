@@ -1,9 +1,6 @@
 package com.storefront.controller;
 
-import com.storefront.model.FulfillmentRequest;
-import com.storefront.model.Order;
-import com.storefront.model.OrderStatusEvent;
-import com.storefront.model.OrderStatusType;
+import com.storefront.model.*;
 import com.storefront.respository.FulfillmentRequestRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +21,7 @@ import java.util.Map;
 
 @Slf4j
 @RestController
-@RequestMapping("/fulfillmentRequests")
+@RequestMapping("/fulfillment")
 public class FulfillmentRequestController {
 
     private FulfillmentRequestRepository fulfillmentRequestRepository;
@@ -39,27 +36,56 @@ public class FulfillmentRequestController {
         this.mongoTemplate = mongoTemplate;
     }
 
-    @RequestMapping(path = "/sample", method = RequestMethod.GET)
-    public ResponseEntity<String> sampleData() {
+    @RequestMapping(path = "/sample/process", method = RequestMethod.GET)
+    public ResponseEntity<String> changeOrderStatusToProcessing() {
 
-        Criteria elementMatchCriteria = Criteria.where("orders.orderStatusEvents")
+        Criteria elementMatchCriteria = Criteria.where("order.orderStatusEvents")
                 .elemMatch(Criteria.where("orderStatusType").is(OrderStatusType.APPROVED));
         Query query = Query.query(elementMatchCriteria);
         List<FulfillmentRequest> fulfillmentRequests = mongoTemplate.find(query, FulfillmentRequest.class);
 
-        log.info("fulfillmentRequests size: " + fulfillmentRequests.size() + '\n');
+        log.info("Fulfillment requests: " + fulfillmentRequests.size() + '\n');
 
         for (FulfillmentRequest fulfillmentRequest : fulfillmentRequests) {
             List<OrderStatusEvent> orderStatusEvents = new ArrayList<>();
-            orderStatusEvents.add(new OrderStatusEvent(OrderStatusType.APPROVED));
+            orderStatusEvents.add(new OrderStatusEvent(OrderStatusType.PROCESSING));
+
+            Order order = fulfillmentRequest.getOrder();
+            order.setOrderStatusEvents(orderStatusEvents);
+            fulfillmentRequest.setOrder(order);
+            fulfillmentRequestRepository.save(fulfillmentRequest);
+        }
+
+        return new ResponseEntity("Order status changed to 'Processing'", HttpStatus.OK);
+    }
+
+    @RequestMapping(path = "/sample/ship", method = RequestMethod.GET)
+    public ResponseEntity<String> changeOrderStatusToShipped() {
+
+        Criteria elementMatchCriteria = Criteria.where("order.orderStatusEvents")
+                .elemMatch(Criteria.where("orderStatusType").is(OrderStatusType.PROCESSING));
+        Query query = Query.query(elementMatchCriteria);
+        List<FulfillmentRequest> fulfillmentRequests = mongoTemplate.find(query, FulfillmentRequest.class);
+
+        log.info("Fulfillment requests: " + fulfillmentRequests.size() + '\n');
+
+        for (FulfillmentRequest fulfillmentRequest : fulfillmentRequests) {
+            List<OrderStatusEvent> orderStatusEvents = new ArrayList<>();
+            orderStatusEvents.add(new OrderStatusEvent(OrderStatusType.SHIPPED));
+
             Order order = fulfillmentRequest.getOrder();
             order.setOrderStatusEvents(orderStatusEvents);
             fulfillmentRequest.setOrder(order);
 
+            fulfillmentRequest.setShippingMethod(ShippingMethod.FedEx);
+            List<ShippingStatusEvent> shippingStatusEvents = new ArrayList<>();
+            shippingStatusEvents.add(new ShippingStatusEvent());
+            fulfillmentRequest.setShippingStatusEvents(shippingStatusEvents);
+
             fulfillmentRequestRepository.save(fulfillmentRequest);
         }
 
-        return new ResponseEntity("Order statuses changed", HttpStatus.OK);
+        return new ResponseEntity("Order status changed 'Shipped'", HttpStatus.OK);
     }
 
     @RequestMapping(path = "/summary", method = RequestMethod.GET)

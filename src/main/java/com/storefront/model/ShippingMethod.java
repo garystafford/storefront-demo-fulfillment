@@ -2,7 +2,7 @@ package com.storefront.model;
 
 public enum ShippingMethod {
     USPS,
-    FedEX,
+    FedEx,
     UPS,
     Uber,
     Drone

@@ -2,6 +2,7 @@ package com.storefront.handler;
 
 import com.storefront.kafka.Sender;
 import com.storefront.model.FulfillmentRequest;
+import com.storefront.model.Order;
 import com.storefront.model.OrderStatusEvent;
 import com.storefront.model.OrderStatusEventChange;
 import lombok.extern.slf4j.Slf4j;
@@ -35,8 +36,11 @@ public class AfterSaveListener extends AbstractMongoEventListener<FulfillmentReq
         FulfillmentRequest fulfillmentRequest = event.getSource();
         List<OrderStatusEvent> orderStatusEvents = fulfillmentRequest.getOrder().getOrderStatusEvents();
         OrderStatusEventChange orderStatusEventChange = new OrderStatusEventChange();
-        orderStatusEventChange.setGuid(fulfillmentRequest.getOrder().getGuid());
+
+        Order order = fulfillmentRequest.getOrder();
+        orderStatusEventChange.setGuid(order.getGuid());
         orderStatusEventChange.setOrderStatusEvent(orderStatusEvents.get(0));
+
         sender.send(topic, orderStatusEventChange);
     }
 }

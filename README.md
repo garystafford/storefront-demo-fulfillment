@@ -37,21 +37,26 @@ java -jar fulfillment-1.0.0.jar --spring.profiles.active=dev --server.port=8095 
 
 ## Creating Sample Data
 
-Create sample customers with an order history.
+Create sample data for each service. Requires Kafka is running.
+
 ```bash
-# create sample accounts customers
+# accounts: create sample customer accounts
 curl http://localhost:8080/customers/sample
 
-# create sample products
+# orders: create sample products
 curl http://localhost:8090/products/sample
 
-# add sample order history to fulfillment customers
-curl http://localhost:8090/customers/samples
-curl http://localhost:8090/customers/sample
+# orders: add sample orders to each customer
+curl http://localhost:8090/customers/sample/orders
 
-# send pending orders to fulfillment service via kakfa
+# orders: send approved orders to fulfillment service
 curl http://localhost:8090/customers/fulfill
 
+# fulfillment: change fulfillment requests from approved to processing
+curl http://localhost:8095/fulfillment/sample/process
+
+# fulfillment: change fulfillment requests from processing to shipped
+curl http://localhost:8095/fulfillment/sample/ship
 ```
 
 ## Container Infrastructure
