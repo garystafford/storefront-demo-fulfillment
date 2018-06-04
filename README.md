@@ -41,7 +41,7 @@ Create sample data for each service. Requires Kafka is running.
 
 ```bash
 # accounts: create sample customer accounts
-curl http://localhost:8080/customers/sample
+curl http://localhost:8085/customers/sample
 
 # orders: create sample products
 curl http://localhost:8090/products/sample
