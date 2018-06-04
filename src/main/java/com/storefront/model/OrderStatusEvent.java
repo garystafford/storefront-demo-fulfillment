@@ -7,7 +7,6 @@ import lombok.NonNull;
 import java.sql.Timestamp;
 
 @Data
-@NoArgsConstructor
 public class OrderStatusEvent {
 
     @NonNull
