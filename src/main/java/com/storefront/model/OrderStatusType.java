@@ -5,7 +5,7 @@ public enum OrderStatusType {
     APPROVED,
     REJECTED,
     PROCESSING,
-    SHIPPED,
+    COMPLETED,
     ON_HOLD,
     CANCELLED,
     RETURNED

@@ -59,7 +59,7 @@ public class FulfillmentRequestController {
         return new ResponseEntity("Order status changed to 'Processing'", HttpStatus.OK);
     }
 
-    @RequestMapping(path = "/sample/ship", method = RequestMethod.GET)
+    @RequestMapping(path = "/sample/complete", method = RequestMethod.GET)
     public ResponseEntity<String> changeOrderStatusToShipped() {
 
         Criteria elementMatchCriteria = Criteria.where("order.orderStatusEvents")
@@ -71,7 +71,7 @@ public class FulfillmentRequestController {
 
         for (FulfillmentRequest fulfillmentRequest : fulfillmentRequests) {
             List<OrderStatusEvent> orderStatusEvents = new ArrayList<>();
-            orderStatusEvents.add(new OrderStatusEvent(OrderStatusType.SHIPPED));
+            orderStatusEvents.add(new OrderStatusEvent(OrderStatusType.COMPLETED));
 
             Order order = fulfillmentRequest.getOrder();
             order.setOrderStatusEvents(orderStatusEvents);
@@ -88,7 +88,7 @@ public class FulfillmentRequestController {
             fulfillmentRequestRepository.save(fulfillmentRequest);
         }
 
-        return new ResponseEntity("Order status changed 'Shipped'", HttpStatus.OK);
+        return new ResponseEntity("Order status changed 'Completed'", HttpStatus.OK);
     }
 
     @RequestMapping(path = "/summary", method = RequestMethod.GET)
