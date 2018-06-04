@@ -78,8 +78,11 @@ public class FulfillmentRequestController {
             fulfillmentRequest.setOrder(order);
 
             fulfillmentRequest.setShippingMethod(ShippingMethod.FedEx);
+
             List<ShippingStatusEvent> shippingStatusEvents = new ArrayList<>();
-            shippingStatusEvents.add(new ShippingStatusEvent());
+            shippingStatusEvents.add(new ShippingStatusEvent(ShippingStatusType.SHIPPED));
+            shippingStatusEvents.add(new ShippingStatusEvent(ShippingStatusType.IN_TRANSIT));
+            shippingStatusEvents.add(new ShippingStatusEvent(ShippingStatusType.RECEIVED));
             fulfillmentRequest.setShippingStatusEvents(shippingStatusEvents);
 
             fulfillmentRequestRepository.save(fulfillmentRequest);
