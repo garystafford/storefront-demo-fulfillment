@@ -1,7 +1,6 @@
 package com.storefront.model;
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 import java.sql.Timestamp;
