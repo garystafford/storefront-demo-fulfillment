@@ -8,7 +8,7 @@ import lombok.NonNull;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderStatusEventChange {
+public class OrderStatusChangeEvent {
 
     @NonNull
     private String guid;

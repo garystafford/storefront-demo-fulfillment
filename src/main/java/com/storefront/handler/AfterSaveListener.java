@@ -4,7 +4,7 @@ import com.storefront.kafka.Sender;
 import com.storefront.model.FulfillmentRequest;
 import com.storefront.model.Order;
 import com.storefront.model.OrderStatusEvent;
-import com.storefront.model.OrderStatusEventChange;
+import com.storefront.model.OrderStatusChangeEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,12 +35,12 @@ public class AfterSaveListener extends AbstractMongoEventListener<FulfillmentReq
         log.info("onAfterSave event='{}'", event);
         FulfillmentRequest fulfillmentRequest = event.getSource();
         List<OrderStatusEvent> orderStatusEvents = fulfillmentRequest.getOrder().getOrderStatusEvents();
-        OrderStatusEventChange orderStatusEventChange = new OrderStatusEventChange();
+        OrderStatusChangeEvent orderStatusChangeEvent = new OrderStatusChangeEvent();
 
         Order order = fulfillmentRequest.getOrder();
-        orderStatusEventChange.setGuid(order.getGuid());
-        orderStatusEventChange.setOrderStatusEvent(orderStatusEvents.get(0));
+        orderStatusChangeEvent.setGuid(order.getGuid());
+        orderStatusChangeEvent.setOrderStatusEvent(orderStatusEvents.get(0));
 
-        sender.send(topic, orderStatusEventChange);
+        sender.send(topic, orderStatusChangeEvent);
     }
 }
