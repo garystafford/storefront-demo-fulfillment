@@ -1,7 +1,7 @@
 package com.storefront.kafka;
 
 import com.storefront.model.Fulfillment;
-import com.storefront.model.FulfillmentEvent;
+import com.storefront.model.FulfillmentRequestEvent;
 import com.storefront.respository.FulfillmentRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,17 +25,17 @@ public class Receiver {
     }
 
     @KafkaListener(topics = "${spring.kafka.topic.orders-order}")
-    public void receive(FulfillmentEvent fulfillmentEvent) {
+    public void receive(FulfillmentRequestEvent fulfillmentRequestEvent) {
 
-        log.info("received payload='{}'", fulfillmentEvent.toString());
+        log.info("received payload='{}'", fulfillmentRequestEvent.toString());
         latch.countDown();
         Fulfillment fulfillment = new Fulfillment();
-        fulfillment.setId(fulfillmentEvent.getId());
-        fulfillment.setTimestamp(fulfillmentEvent.getTimestamp());
-        fulfillment.setName(fulfillmentEvent.getName());
-        fulfillment.setContact(fulfillmentEvent.getContact());
-        fulfillment.setAddress(fulfillmentEvent.getAddress());
-        fulfillment.setOrder(fulfillmentEvent.getOrder());
+        fulfillment.setId(fulfillmentRequestEvent.getId());
+        fulfillment.setTimestamp(fulfillmentRequestEvent.getTimestamp());
+        fulfillment.setName(fulfillmentRequestEvent.getName());
+        fulfillment.setContact(fulfillmentRequestEvent.getContact());
+        fulfillment.setAddress(fulfillmentRequestEvent.getAddress());
+        fulfillment.setOrder(fulfillmentRequestEvent.getOrder());
         fulfillmentRepository.save(fulfillment);
     }
 }

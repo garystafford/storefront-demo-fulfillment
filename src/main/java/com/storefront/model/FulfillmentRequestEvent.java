@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(collection = "fulfillment.requests")
-public class FulfillmentEvent {
+public class FulfillmentRequestEvent {
 
     @Id
     private String id;

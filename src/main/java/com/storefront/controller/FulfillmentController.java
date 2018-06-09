@@ -48,21 +48,21 @@ public class FulfillmentController {
 
     @RequestMapping(path = "/summary", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<Map<String, List<FulfillmentEvent>>> fulfillmentRequestSummary() {
+    public ResponseEntity<Map<String, List<FulfillmentRequestEvent>>> fulfillmentRequestSummary() {
 
-        List<FulfillmentEvent> fulfillmentEvents = fulfillmentRepository.findAll();
-        return new ResponseEntity<>(Collections.singletonMap("fulfillmentEvents", fulfillmentEvents), HttpStatus.OK);
+        List<FulfillmentRequestEvent> fulfillmentRequestEvents = fulfillmentRepository.findAll();
+        return new ResponseEntity<>(Collections.singletonMap("fulfillmentRequestEvents", fulfillmentRequestEvents), HttpStatus.OK);
     }
 
     @RequestMapping(path = "/sample/process", method = RequestMethod.GET)
     public ResponseEntity<String> changeOrderStatusToProcessing() {
 
-        List<FulfillmentEvent> fulfillmentEvents = getFulfillmentRequestEvents(OrderStatusType.APPROVED);
+        List<FulfillmentRequestEvent> fulfillmentRequestEvents = getFulfillmentRequestEvents(OrderStatusType.APPROVED);
 
-        log.info("Approved fulfillment requests count: " + fulfillmentEvents.size() + '\n');
+        log.info("Approved fulfillment requests count: " + fulfillmentRequestEvents.size() + '\n');
 
-        for (FulfillmentEvent fulfillmentEvent : fulfillmentEvents) {
-            processFulfillmentRequestEvent(fulfillmentEvent, OrderStatusType.PROCESSING);
+        for (FulfillmentRequestEvent fulfillmentRequestEvent : fulfillmentRequestEvents) {
+            processFulfillmentRequestEvent(fulfillmentRequestEvent, OrderStatusType.PROCESSING);
         }
 
         return new ResponseEntity("Order status changed to 'Processing'", HttpStatus.OK);
@@ -71,13 +71,13 @@ public class FulfillmentController {
     @RequestMapping(path = "/sample/ship", method = RequestMethod.GET)
     public ResponseEntity<String> changeOrderStatusToShipped() {
 
-        List<FulfillmentEvent> fulfillmentEvents = getFulfillmentRequestEvents(OrderStatusType.PROCESSING);
+        List<FulfillmentRequestEvent> fulfillmentRequestEvents = getFulfillmentRequestEvents(OrderStatusType.PROCESSING);
 
-        log.info("Processing fulfillment requests count: " + fulfillmentEvents.size() + '\n');
+        log.info("Processing fulfillment requests count: " + fulfillmentRequestEvents.size() + '\n');
 
-        for (FulfillmentEvent fulfillmentEvent : fulfillmentEvents) {
-            fulfillmentEvent.setShippingMethod(SampleData.getRandomShippingMethod());
-            processFulfillmentRequestEvent(fulfillmentEvent, OrderStatusType.SHIPPED);
+        for (FulfillmentRequestEvent fulfillmentRequestEvent : fulfillmentRequestEvents) {
+            fulfillmentRequestEvent.setShippingMethod(SampleData.getRandomShippingMethod());
+            processFulfillmentRequestEvent(fulfillmentRequestEvent, OrderStatusType.SHIPPED);
         }
 
         return new ResponseEntity("Order status changed 'Shipped'", HttpStatus.OK);
@@ -86,12 +86,12 @@ public class FulfillmentController {
     @RequestMapping(path = "/sample/in-transit", method = RequestMethod.GET)
     public ResponseEntity<String> changeOrderStatusToInTransit() {
 
-        List<FulfillmentEvent> fulfillmentEvents = getFulfillmentRequestEvents(OrderStatusType.SHIPPED);
+        List<FulfillmentRequestEvent> fulfillmentRequestEvents = getFulfillmentRequestEvents(OrderStatusType.SHIPPED);
 
-        log.info("Shipped fulfillment requests count: " + fulfillmentEvents.size() + '\n');
+        log.info("Shipped fulfillment requests count: " + fulfillmentRequestEvents.size() + '\n');
 
-        for (FulfillmentEvent fulfillmentEvent : fulfillmentEvents) {
-            processFulfillmentRequestEvent(fulfillmentEvent, OrderStatusType.IN_TRANSIT);
+        for (FulfillmentRequestEvent fulfillmentRequestEvent : fulfillmentRequestEvents) {
+            processFulfillmentRequestEvent(fulfillmentRequestEvent, OrderStatusType.IN_TRANSIT);
         }
 
         return new ResponseEntity("Order status changed 'In Transit'", HttpStatus.OK);
@@ -100,35 +100,35 @@ public class FulfillmentController {
     @RequestMapping(path = "/sample/receive", method = RequestMethod.GET)
     public ResponseEntity<String> changeOrderStatusToReceived() {
 
-        List<FulfillmentEvent> fulfillmentEvents = getFulfillmentRequestEvents(OrderStatusType.IN_TRANSIT);
+        List<FulfillmentRequestEvent> fulfillmentRequestEvents = getFulfillmentRequestEvents(OrderStatusType.IN_TRANSIT);
 
-        log.info("In Transit fulfillment requests count: " + fulfillmentEvents.size() + '\n');
+        log.info("In Transit fulfillment requests count: " + fulfillmentRequestEvents.size() + '\n');
 
-        for (FulfillmentEvent fulfillmentEvent : fulfillmentEvents) {
-            processFulfillmentRequestEvent(fulfillmentEvent, OrderStatusType.RECEIVED);
+        for (FulfillmentRequestEvent fulfillmentRequestEvent : fulfillmentRequestEvents) {
+            processFulfillmentRequestEvent(fulfillmentRequestEvent, OrderStatusType.RECEIVED);
         }
 
         return new ResponseEntity("Order status changed 'Received'", HttpStatus.OK);
     }
 
-    private List<FulfillmentEvent> getFulfillmentRequestEvents(OrderStatusType orderStatusType) {
+    private List<FulfillmentRequestEvent> getFulfillmentRequestEvents(OrderStatusType orderStatusType) {
 
         Criteria elementMatchCriteria = Criteria.where("order.orderStatusEvents")
                 .elemMatch(Criteria.where("orderStatusType").is(orderStatusType));
         Query query = Query.query(elementMatchCriteria);
-        return mongoTemplate.find(query, FulfillmentEvent.class);
+        return mongoTemplate.find(query, FulfillmentRequestEvent.class);
     }
 
-    private void processFulfillmentRequestEvent(FulfillmentEvent fulfillmentEvent, OrderStatusType orderStatusType) {
+    private void processFulfillmentRequestEvent(FulfillmentRequestEvent fulfillmentRequestEvent, OrderStatusType orderStatusType) {
 
         List<OrderStatusEvent> orderStatusEvents = new ArrayList<>();
         OrderStatusEvent orderStatusEvent = new OrderStatusEvent(orderStatusType);
         orderStatusEvents.add(orderStatusEvent);
 
-        Order order = fulfillmentEvent.getOrder();
+        Order order = fulfillmentRequestEvent.getOrder();
         order.setOrderStatusEvents(orderStatusEvents);
-        fulfillmentEvent.setOrder(order);
-        fulfillmentRepository.save(fulfillmentEvent);
+        fulfillmentRequestEvent.setOrder(order);
+        fulfillmentRepository.save(fulfillmentRequestEvent);
         sendOrderStatusEvent(orderStatusEvent, order);
     }
 

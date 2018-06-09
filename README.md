@@ -127,7 +127,7 @@ db.fulfillment.requests.remove({})
 			"shippingStatusType" : "RECEIVED"
 		}
 	],
-	"_class" : "com.storefront.model.FulfillmentEvent"
+	"_class" : "com.storefront.model.FulfillmentRequestEvent"
 }
 ```
 
