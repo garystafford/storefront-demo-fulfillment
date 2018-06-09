@@ -1,7 +1,7 @@
 package com.storefront.config;
 
 import com.storefront.kafka.Receiver;
-import com.storefront.model.FulfillmentRequestEvent;
+import com.storefront.model.FulfillmentEvent;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,16 +43,16 @@ public class ReceiverConfig {
     }
 
     @Bean
-    public ConsumerFactory<String, FulfillmentRequestEvent> consumerFactory() {
+    public ConsumerFactory<String, FulfillmentEvent> consumerFactory() {
 
         return new DefaultKafkaConsumerFactory<>(consumerConfigs(), new StringDeserializer(),
-                new JsonDeserializer<>(FulfillmentRequestEvent.class));
+                new JsonDeserializer<>(FulfillmentEvent.class));
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, FulfillmentRequestEvent> kafkaListenerContainerFactory() {
+    public ConcurrentKafkaListenerContainerFactory<String, FulfillmentEvent> kafkaListenerContainerFactory() {
 
-        ConcurrentKafkaListenerContainerFactory<String, FulfillmentRequestEvent> factory =
+        ConcurrentKafkaListenerContainerFactory<String, FulfillmentEvent> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
 

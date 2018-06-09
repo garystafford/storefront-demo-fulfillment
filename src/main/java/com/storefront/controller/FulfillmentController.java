@@ -2,7 +2,7 @@ package com.storefront.controller;
 
 import com.storefront.kafka.Sender;
 import com.storefront.model.*;
-import com.storefront.respository.FulfillmentRequestRepository;
+import com.storefront.respository.FulfillmentRepository;
 import com.storefront.utilities.SampleData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,11 +25,11 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequestMapping("/fulfillment")
-public class FulfillmentRequestController {
+public class FulfillmentController {
 
     private Sender sender;
 
-    private FulfillmentRequestRepository fulfillmentRequestRepository;
+    private FulfillmentRepository fulfillmentRepository;
 
     private MongoTemplate mongoTemplate;
 
@@ -37,32 +37,32 @@ public class FulfillmentRequestController {
     private String topic;
 
     @Autowired
-    public FulfillmentRequestController(Sender sender,
-                                        FulfillmentRequestRepository fulfillmentRequestRepository,
-                                        MongoTemplate mongoTemplate) {
+    public FulfillmentController(Sender sender,
+                                 FulfillmentRepository fulfillmentRepository,
+                                 MongoTemplate mongoTemplate) {
 
         this.sender = sender;
-        this.fulfillmentRequestRepository = fulfillmentRequestRepository;
+        this.fulfillmentRepository = fulfillmentRepository;
         this.mongoTemplate = mongoTemplate;
     }
 
     @RequestMapping(path = "/summary", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<Map<String, List<FulfillmentRequestEvent>>> fulfillmentRequestSummary() {
+    public ResponseEntity<Map<String, List<FulfillmentEvent>>> fulfillmentRequestSummary() {
 
-        List<FulfillmentRequestEvent> fulfillmentRequestEvents = fulfillmentRequestRepository.findAll();
-        return new ResponseEntity<>(Collections.singletonMap("fulfillmentRequestEvents", fulfillmentRequestEvents), HttpStatus.OK);
+        List<FulfillmentEvent> fulfillmentEvents = fulfillmentRepository.findAll();
+        return new ResponseEntity<>(Collections.singletonMap("fulfillmentEvents", fulfillmentEvents), HttpStatus.OK);
     }
 
     @RequestMapping(path = "/sample/process", method = RequestMethod.GET)
     public ResponseEntity<String> changeOrderStatusToProcessing() {
 
-        List<FulfillmentRequestEvent> fulfillmentRequestEvents = getFulfillmentRequestEvents(OrderStatusType.APPROVED);
+        List<FulfillmentEvent> fulfillmentEvents = getFulfillmentRequestEvents(OrderStatusType.APPROVED);
 
-        log.info("Approved fulfillment requests count: " + fulfillmentRequestEvents.size() + '\n');
+        log.info("Approved fulfillment requests count: " + fulfillmentEvents.size() + '\n');
 
-        for (FulfillmentRequestEvent fulfillmentRequestEvent : fulfillmentRequestEvents) {
-            processFulfillmentRequestEvent(fulfillmentRequestEvent, OrderStatusType.PROCESSING);
+        for (FulfillmentEvent fulfillmentEvent : fulfillmentEvents) {
+            processFulfillmentRequestEvent(fulfillmentEvent, OrderStatusType.PROCESSING);
         }
 
         return new ResponseEntity("Order status changed to 'Processing'", HttpStatus.OK);
@@ -71,13 +71,13 @@ public class FulfillmentRequestController {
     @RequestMapping(path = "/sample/ship", method = RequestMethod.GET)
     public ResponseEntity<String> changeOrderStatusToShipped() {
 
-        List<FulfillmentRequestEvent> fulfillmentRequestEvents = getFulfillmentRequestEvents(OrderStatusType.PROCESSING);
+        List<FulfillmentEvent> fulfillmentEvents = getFulfillmentRequestEvents(OrderStatusType.PROCESSING);
 
-        log.info("Processing fulfillment requests count: " + fulfillmentRequestEvents.size() + '\n');
+        log.info("Processing fulfillment requests count: " + fulfillmentEvents.size() + '\n');
 
-        for (FulfillmentRequestEvent fulfillmentRequestEvent : fulfillmentRequestEvents) {
-            fulfillmentRequestEvent.setShippingMethod(SampleData.getRandomShippingMethod());
-            processFulfillmentRequestEvent(fulfillmentRequestEvent, OrderStatusType.SHIPPED);
+        for (FulfillmentEvent fulfillmentEvent : fulfillmentEvents) {
+            fulfillmentEvent.setShippingMethod(SampleData.getRandomShippingMethod());
+            processFulfillmentRequestEvent(fulfillmentEvent, OrderStatusType.SHIPPED);
         }
 
         return new ResponseEntity("Order status changed 'Shipped'", HttpStatus.OK);
@@ -86,12 +86,12 @@ public class FulfillmentRequestController {
     @RequestMapping(path = "/sample/in-transit", method = RequestMethod.GET)
     public ResponseEntity<String> changeOrderStatusToInTransit() {
 
-        List<FulfillmentRequestEvent> fulfillmentRequestEvents = getFulfillmentRequestEvents(OrderStatusType.SHIPPED);
+        List<FulfillmentEvent> fulfillmentEvents = getFulfillmentRequestEvents(OrderStatusType.SHIPPED);
 
-        log.info("Shipped fulfillment requests count: " + fulfillmentRequestEvents.size() + '\n');
+        log.info("Shipped fulfillment requests count: " + fulfillmentEvents.size() + '\n');
 
-        for (FulfillmentRequestEvent fulfillmentRequestEvent : fulfillmentRequestEvents) {
-            processFulfillmentRequestEvent(fulfillmentRequestEvent, OrderStatusType.IN_TRANSIT);
+        for (FulfillmentEvent fulfillmentEvent : fulfillmentEvents) {
+            processFulfillmentRequestEvent(fulfillmentEvent, OrderStatusType.IN_TRANSIT);
         }
 
         return new ResponseEntity("Order status changed 'In Transit'", HttpStatus.OK);
@@ -100,35 +100,35 @@ public class FulfillmentRequestController {
     @RequestMapping(path = "/sample/receive", method = RequestMethod.GET)
     public ResponseEntity<String> changeOrderStatusToReceived() {
 
-        List<FulfillmentRequestEvent> fulfillmentRequestEvents = getFulfillmentRequestEvents(OrderStatusType.IN_TRANSIT);
+        List<FulfillmentEvent> fulfillmentEvents = getFulfillmentRequestEvents(OrderStatusType.IN_TRANSIT);
 
-        log.info("In Transit fulfillment requests count: " + fulfillmentRequestEvents.size() + '\n');
+        log.info("In Transit fulfillment requests count: " + fulfillmentEvents.size() + '\n');
 
-        for (FulfillmentRequestEvent fulfillmentRequestEvent : fulfillmentRequestEvents) {
-            processFulfillmentRequestEvent(fulfillmentRequestEvent, OrderStatusType.RECEIVED);
+        for (FulfillmentEvent fulfillmentEvent : fulfillmentEvents) {
+            processFulfillmentRequestEvent(fulfillmentEvent, OrderStatusType.RECEIVED);
         }
 
         return new ResponseEntity("Order status changed 'Received'", HttpStatus.OK);
     }
 
-    private List<FulfillmentRequestEvent> getFulfillmentRequestEvents(OrderStatusType orderStatusType) {
+    private List<FulfillmentEvent> getFulfillmentRequestEvents(OrderStatusType orderStatusType) {
 
         Criteria elementMatchCriteria = Criteria.where("order.orderStatusEvents")
                 .elemMatch(Criteria.where("orderStatusType").is(orderStatusType));
         Query query = Query.query(elementMatchCriteria);
-        return mongoTemplate.find(query, FulfillmentRequestEvent.class);
+        return mongoTemplate.find(query, FulfillmentEvent.class);
     }
 
-    private void processFulfillmentRequestEvent(FulfillmentRequestEvent fulfillmentRequestEvent, OrderStatusType orderStatusType) {
+    private void processFulfillmentRequestEvent(FulfillmentEvent fulfillmentEvent, OrderStatusType orderStatusType) {
 
         List<OrderStatusEvent> orderStatusEvents = new ArrayList<>();
         OrderStatusEvent orderStatusEvent = new OrderStatusEvent(orderStatusType);
         orderStatusEvents.add(orderStatusEvent);
 
-        Order order = fulfillmentRequestEvent.getOrder();
+        Order order = fulfillmentEvent.getOrder();
         order.setOrderStatusEvents(orderStatusEvents);
-        fulfillmentRequestEvent.setOrder(order);
-        fulfillmentRequestRepository.save(fulfillmentRequestEvent);
+        fulfillmentEvent.setOrder(order);
+        fulfillmentRepository.save(fulfillmentEvent);
         sendOrderStatusEvent(orderStatusEvent, order);
     }
 
