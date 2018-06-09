@@ -23,23 +23,26 @@ I develop and debug directly from JetBrains IntelliJ. The default Spring profile
 Create sample data for each service. Requires Kafka is running.
 
 ```bash
-# accounts: create sample customer accounts
+# accounts - create sample customer accounts
 http http://localhost:8085/customers/sample
 
-# orders: create sample products
-http http://localhost:8090/products/sample
-
-# orders: add sample orders to each customer
+# orders - add sample orders to each customer
 http http://localhost:8090/customers/sample/orders
 
-# orders: send approved orders to fulfillment service
+# orders - send approved orders to fulfillment service
 http http://localhost:8090/customers/fulfill
 
-# fulfillment: change fulfillment requests from approved to processing
+# fulfillment - change fulfillment requests from approved to processing
 http http://localhost:8095/fulfillment/sample/process
 
-# fulfillment: change fulfillment requests from processing to completed
-http http://localhost:8095/fulfillment/sample/complete
+# fulfillment - change fulfillment requests from processing to shipping
+http http://localhost:8095/fulfillment/sample/ship
+
+# fulfillment - change fulfillment requests from processing to in transit
+http http://localhost:8095/fulfillment/sample/in-transit
+
+# fulfillment - change fulfillment requests from in transit to in received
+http http://localhost:8095/fulfillment/sample/receive
 ```
 
 ## Container Infrastructure
@@ -54,7 +57,7 @@ df8914058cbb        hlebalbau/kafka-manager:latest   "/kafka-manager/bin/…"   
 
 ## Orders Customer Object in MongoDB
 
-```bash
+```text
 docker exec -it kafka-docker_mongo_1 sh
 mongo
 use fulfillment
@@ -124,7 +127,7 @@ db.fulfillment.requests.remove({})
 			"shippingStatusType" : "RECEIVED"
 		}
 	],
-	"_class" : "com.storefront.model.FulfillmentRequest"
+	"_class" : "com.storefront.model.FulfillmentRequestEvent"
 }
 ```
 
