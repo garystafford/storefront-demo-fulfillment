@@ -10,7 +10,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "fulfillment.requests")
 public class FulfillmentRequestEvent {
 
     @Id
@@ -30,7 +29,4 @@ public class FulfillmentRequestEvent {
 
     @NonNull
     private Order order;
-
-    @NonNull
-    private ShippingMethod shippingMethod;
 }
