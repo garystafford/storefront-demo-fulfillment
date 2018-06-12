@@ -80,7 +80,7 @@ public class FulfillmentController {
             processFulfillment(fulfillment, OrderStatusType.SHIPPED);
         }
 
-        return new ResponseEntity("Order status changed 'Shipped'", HttpStatus.OK);
+        return new ResponseEntity("Order status changed to 'Shipped'", HttpStatus.OK);
     }
 
     @RequestMapping(path = "/sample/in-transit", method = RequestMethod.GET)
@@ -94,7 +94,7 @@ public class FulfillmentController {
             processFulfillment(fulfillment, OrderStatusType.IN_TRANSIT);
         }
 
-        return new ResponseEntity("Order status changed 'In Transit'", HttpStatus.OK);
+        return new ResponseEntity("Order status changed to 'In Transit'", HttpStatus.OK);
     }
 
     @RequestMapping(path = "/sample/receive", method = RequestMethod.GET)
@@ -108,7 +108,7 @@ public class FulfillmentController {
             processFulfillment(fulfillment, OrderStatusType.RECEIVED);
         }
 
-        return new ResponseEntity("Order status changed 'Received'", HttpStatus.OK);
+        return new ResponseEntity("Order status changed to 'Received'", HttpStatus.OK);
     }
 
     private List<Fulfillment> getFulfillments(OrderStatusType orderStatusType) {
