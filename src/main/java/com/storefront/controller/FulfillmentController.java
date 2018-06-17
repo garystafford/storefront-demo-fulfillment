@@ -24,7 +24,7 @@ import java.util.Map;
 
 @Slf4j
 @RestController
-@RequestMapping("/fulfillment")
+@RequestMapping("/fulfillments")
 public class FulfillmentController {
 
     private Sender sender;
