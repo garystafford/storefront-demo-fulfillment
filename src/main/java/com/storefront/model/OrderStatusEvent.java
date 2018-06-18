@@ -16,6 +16,11 @@ public class OrderStatusEvent {
 
     private String note;
 
+    public OrderStatusEvent() {
+
+        this.timestamp = new Timestamp(System.currentTimeMillis()).getTime();
+    }
+
     public OrderStatusEvent(OrderStatusType orderStatusType) {
 
         this.timestamp = new Timestamp(System.currentTimeMillis()).getTime();
