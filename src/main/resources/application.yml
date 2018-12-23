@@ -28,11 +28,6 @@ server:
   port: 8080
 spring:
   profiles: gke
-  data:
-    mongodb:
-      uri: mongodb://mongo:27017/fulfillment
-  kafka:
-    bootstrap-servers: kafka:9092
 logging:
   level:
     root: INFO

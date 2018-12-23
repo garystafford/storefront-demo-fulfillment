@@ -23,6 +23,24 @@ public class ReceiverConfig {
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
 
+    @Value("${spring.kafka.properties.ssl.endpoint.identification.algorithm}")
+    private String sslEndpointIdentificationAlgorithm;
+
+    @Value("${spring.kafka.properties.sasl.mechanism}")
+    private String saslMechanism;
+
+    @Value("${spring.kafka.properties.request.timeout.ms}")
+    private String requestTimeoutMs;
+
+    @Value("${spring.kafka.properties.retry.backoff.ms}")
+    private String retryBackoffMs;
+
+    @Value("${spring.kafka.properties.security.protocol}")
+    private String securityProtocol;
+
+    @Value("${spring.kafka.properties.sasl.jaas.config}")
+    private String saslJaasConfig;
+
     @Value("${spring.kafka.consumer.group-id}")
     private String groupId;
 
@@ -38,6 +56,12 @@ public class ReceiverConfig {
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, autoOffsetReset);
+        props.put("ssl.endpoint.identification.algorithm", sslEndpointIdentificationAlgorithm);
+        props.put("sasl.mechanism", saslMechanism);
+        props.put("request.timeout.ms", requestTimeoutMs);
+        props.put("retry.backoff.ms", retryBackoffMs);
+        props.put("security.protocol", securityProtocol);
+        props.put("sasl.jaas.config", saslJaasConfig);
 
         return props;
     }
