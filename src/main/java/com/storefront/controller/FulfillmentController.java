@@ -27,11 +27,11 @@ import java.util.Map;
 @RequestMapping("/fulfillments")
 public class FulfillmentController {
 
-    private Sender sender;
+    private final Sender sender;
 
-    private FulfillmentRepository fulfillmentRepository;
+    private final FulfillmentRepository fulfillmentRepository;
 
-    private MongoTemplate mongoTemplate;
+    private final MongoTemplate mongoTemplate;
 
     @Value("${spring.kafka.topic.fulfillment-order}")
     private String topic;
@@ -65,7 +65,7 @@ public class FulfillmentController {
             processFulfillment(fulfillment, OrderStatusType.PROCESSING);
         }
 
-        return new ResponseEntity("Order status changed to 'Processing'", HttpStatus.OK);
+        return new ResponseEntity<>("Order status changed to 'Processing'", HttpStatus.OK);
     }
 
     @RequestMapping(path = "/sample/ship", method = RequestMethod.GET)
@@ -80,7 +80,7 @@ public class FulfillmentController {
             processFulfillment(fulfillment, OrderStatusType.SHIPPED);
         }
 
-        return new ResponseEntity("Order status changed to 'Shipped'", HttpStatus.OK);
+        return new ResponseEntity<>("Order status changed to 'Shipped'", HttpStatus.OK);
     }
 
     @RequestMapping(path = "/sample/in-transit", method = RequestMethod.GET)
@@ -94,7 +94,7 @@ public class FulfillmentController {
             processFulfillment(fulfillment, OrderStatusType.IN_TRANSIT);
         }
 
-        return new ResponseEntity("Order status changed to 'In Transit'", HttpStatus.OK);
+        return new ResponseEntity<>("Order status changed to 'In Transit'", HttpStatus.OK);
     }
 
     @RequestMapping(path = "/sample/receive", method = RequestMethod.GET)
@@ -108,7 +108,7 @@ public class FulfillmentController {
             processFulfillment(fulfillment, OrderStatusType.RECEIVED);
         }
 
-        return new ResponseEntity("Order status changed to 'Received'", HttpStatus.OK);
+        return new ResponseEntity<>("Order status changed to 'Received'", HttpStatus.OK);
     }
 
     private List<Fulfillment> getFulfillments(OrderStatusType orderStatusType) {

@@ -36,10 +36,10 @@ public class SwaggerConfig {
                 .contact(new Contact(
                         "Gary A. Stafford",
                         "https://programmaticponderings.com/about",
-                        "garystafford@rochester.rr.com"))
+                        "gary.a.stafford@gmail.com"))
                 .license("Apache License Version 2.0")
                 .licenseUrl("https://github.com/garystafford/storefront-demo-fulfillment/blob/master/LICENSE")
-                .version("2.1.0")
+                .version("3.0.0")
                 .build();
     }
 }

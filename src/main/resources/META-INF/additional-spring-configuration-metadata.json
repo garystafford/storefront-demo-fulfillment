@@ -1,0 +1,19 @@
+{
+  "properties": [
+    {
+      "name": "spring.kafka.topic.accounts-customer",
+      "type": "java.lang.String",
+      "description": "Description for spring.kafka.topic.accounts-customer."
+    },
+    {
+      "name": "spring.kafka.topic.orders-order",
+      "type": "java.lang.String",
+      "description": "Description for spring.kafka.topic.orders-order."
+    },
+    {
+      "name": "spring.kafka.topic.fulfillment-order",
+      "type": "java.lang.String",
+      "description": "Description for spring.kafka.topic.fulfillment-order."
+    }
+  ]
+}

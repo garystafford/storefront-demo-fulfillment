@@ -7,9 +7,9 @@ spring:
     name: fulfillment
   data:
     mongodb:
-      uri: mongodb://localhost:27017/fulfillment
+      uri: mongodb://mongo:27017/fulfillment
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: kafka:9092
     topic:
       accounts-customer: accounts.customer.change
       orders-order: orders.order.fulfill
@@ -24,12 +24,14 @@ management:
         include: '*'
 logging:
   level:
-    root: DEBUG
+    root: INFO
 ---
 server:
   port: 8080
-spring:
-  profiles: gke
 logging:
   level:
     root: INFO
+spring:
+  config:
+    activate:
+      on-profile: gke
