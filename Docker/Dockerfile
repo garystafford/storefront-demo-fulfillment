@@ -1,6 +1,6 @@
 FROM openjdk:16-jdk-alpine3.13
 LABEL maintainer="Gary A. Stafford <gary.a.stafford@gmail.com>"
-ENV REFRESHED_AT 2021-05-09
+ENV REFRESHED_AT 2021-05-10
 EXPOSE 8080
 RUN set -ex \
   && apk update \
