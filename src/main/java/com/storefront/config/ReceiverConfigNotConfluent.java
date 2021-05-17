@@ -17,7 +17,7 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 import java.util.HashMap;
 import java.util.Map;
 
-@Profile("!gke")
+@Profile("!confluent")
 @Configuration
 @EnableKafka
 public class ReceiverConfigNotConfluent implements ReceiverConfig {
@@ -49,7 +49,8 @@ public class ReceiverConfigNotConfluent implements ReceiverConfig {
     @Bean
     public ConsumerFactory<String, FulfillmentRequestEvent> consumerFactory() {
 
-        return new DefaultKafkaConsumerFactory<>(consumerConfigs(), new StringDeserializer(),
+        return new DefaultKafkaConsumerFactory<>(consumerConfigs(),
+                new StringDeserializer(),
                 new JsonDeserializer<>(FulfillmentRequestEvent.class));
     }
 

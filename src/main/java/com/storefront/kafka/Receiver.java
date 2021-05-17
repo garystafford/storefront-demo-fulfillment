@@ -17,7 +17,7 @@ public class Receiver {
     @Autowired
     private FulfillmentRepository fulfillmentRepository;
 
-    private CountDownLatch latch = new CountDownLatch(1);
+    private final CountDownLatch latch = new CountDownLatch(1);
 
     public CountDownLatch getLatch() {
 
